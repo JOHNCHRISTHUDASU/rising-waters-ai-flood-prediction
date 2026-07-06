@@ -1,0 +1,71 @@
+import { Routes, Route, Navigate } from './lib/router';
+import { useEffect } from 'react';
+import { logger } from './lib/logger';
+import ProtectedRoute from './components/ProtectedRoute';
+import LoginPage from './pages/auth/LoginPage';
+import SignupPage from './pages/auth/SignupPage';
+import DashboardPage from './pages/DashboardPage';
+import PredictPage from './pages/PredictPage';
+import HistoryPage from './pages/HistoryPage';
+import ModelPage from './pages/ModelPage';
+import ContactPage from './pages/ContactPage';
+import NotFoundPage from './pages/NotFoundPage';
+import ServerErrorPage from './pages/ServerErrorPage';
+
+export default function App() {
+  useEffect(() => {
+    logger.info('Rising Waters application started');
+  }, []);
+
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/error" element={<ServerErrorPage />} />
+
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/predict"
+        element={
+          <ProtectedRoute>
+            <PredictPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/history"
+        element={
+          <ProtectedRoute>
+            <HistoryPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/model"
+        element={
+          <ProtectedRoute>
+            <ModelPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contact"
+        element={
+          <ProtectedRoute>
+            <ContactPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+}

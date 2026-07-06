@@ -1,0 +1,72 @@
+# Rising Waters — AI Flood Prediction System
+
+A production-ready web application that predicts flood risk from weather and rainfall data using a client-side logistic regression model with gradient descent training.
+
+## Features
+
+- **AI Flood Prediction**: Logistic regression model trained with gradient descent on synthetic weather data
+- **Automatic Model Training**: Model trains automatically on first use and persists to localStorage
+- **Prediction History**: All predictions stored in Supabase with full CRUD operations
+- **Model Performance Dashboard**: View accuracy, precision, recall, F1 score, AUC-ROC, confusion matrix, training history, and feature importance
+- **Data Export**: Export prediction history as CSV or JSON
+- **Authentication**: Email/password auth via Supabase Auth
+- **Input Validation**: Comprehensive client-side validation with real-time feedback
+- **Error Handling**: Graceful error states with user-friendly messages
+- **Logging**: Client-side logging system with console output
+- **Responsive Design**: Optimized for mobile, tablet, and desktop
+
+## Tech Stack
+
+- **Frontend**: React 18, TypeScript, Vite
+- **Styling**: Tailwind CSS with custom theme
+- **Charts**: Recharts
+- **Icons**: Lucide React
+- **Routing**: React Router v6
+- **Backend**: Supabase (PostgreSQL, Auth, RLS)
+- **AI Model**: Client-side logistic regression with gradient descent
+
+## Architecture
+
+### AI Model (`src/lib/floodModel.ts`)
+- Logistic regression with 10 input features
+- Gradient descent optimization (200 epochs, learning rate 0.1)
+- Trained on 1,000 synthetic weather samples with realistic flood risk correlations
+- Features: rainfall, river level, soil moisture, temperature, humidity, wind speed, pressure, elevation, drainage capacity, urbanization
+- Model weights and metrics persisted to localStorage
+- Feature importance computed from normalized weight magnitudes
+
+### Database Schema
+- `flood_predictions` table with owner-scoped RLS policies
+- Each user can only access their own predictions
+- Indexed on user_id, created_at, and risk_level
+
+### Pages
+- **Login / Signup**: Email/password authentication
+- **Dashboard**: Overview metrics, probability trend chart, risk distribution pie chart, recent predictions
+- **Predict**: 10-field input form with validation, real-time prediction results, top contributing factors
+- **History**: Searchable/filterable prediction table with CSV/JSON export and delete
+- **Model Performance**: Training history line chart, confusion matrix, feature importance bars, retrain button
+- **Contact**: Contact form with validation
+- **404 / 500**: Error pages
+
+## Getting Started
+
+The dev server runs automatically. The app will redirect to the login page on first visit.
+
+1. Create an account via the signup page
+2. The AI model trains automatically on first use
+3. Navigate to "New Prediction" to enter weather data and get flood risk predictions
+4. View prediction history and model performance in their respective pages
+
+## Environment Variables
+
+Supabase environment variables are pre-configured:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+## Scripts
+
+- `npm run build` — Production build
+- `npm run typecheck` — TypeScript type checking
+- `npm run lint` — ESLint
+- `npm run dev` — Start dev server (runs automatically in Bolt)

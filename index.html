@@ -1,0 +1,70 @@
+/*
+# Create flood_predictions table for Rising Waters
+
+1. New Tables
+- `flood_predictions`
+  - `id` (uuid, primary key)
+  - `user_id` (uuid, not null, defaults to authenticated user, references auth.users with cascade delete)
+  - `rainfall_mm` (numeric, not null) — daily rainfall in millimeters
+  - `river_level_m` (numeric, not null) — river water level in meters
+  - `soil_moisture_pct` (numeric, not null) — soil moisture percentage 0-100
+  - `temperature_c` (numeric, not null) — air temperature in Celsius
+  - `humidity_pct` (numeric, not null) — relative humidity percentage 0-100
+  - `wind_speed_kmh` (numeric, not null) — wind speed in km/h
+  - `pressure_hpa` (numeric, not null) — atmospheric pressure in hPa
+  - `elevation_m` (numeric, not null) — terrain elevation in meters
+  - `drainage_capacity` (numeric, not null) — drainage capacity score 0-100
+  - `urbanization_pct` (numeric, not null) — urbanization percentage 0-100
+  - `flood_probability` (numeric, not null) — model output 0-1
+  - `risk_level` (text, not null) — low/moderate/high/extreme
+  - `confidence_score` (numeric, not null) — model confidence 0-1
+  - `top_factors` (jsonb) — top contributing factors with weights
+  - `created_at` (timestamptz, default now())
+
+2. Security
+- Enable RLS on `flood_predictions`.
+- Owner-scoped CRUD: each authenticated user can only access their own prediction rows.
+- 4 separate policies (select/insert/update/delete) scoped to authenticated users with auth.uid() ownership checks.
+*/
+
+CREATE TABLE IF NOT EXISTS flood_predictions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL DEFAULT auth.uid() REFERENCES auth.users(id) ON DELETE CASCADE,
+  rainfall_mm numeric NOT NULL,
+  river_level_m numeric NOT NULL,
+  soil_moisture_pct numeric NOT NULL,
+  temperature_c numeric NOT NULL,
+  humidity_pct numeric NOT NULL,
+  wind_speed_kmh numeric NOT NULL,
+  pressure_hpa numeric NOT NULL,
+  elevation_m numeric NOT NULL,
+  drainage_capacity numeric NOT NULL,
+  urbanization_pct numeric NOT NULL,
+  flood_probability numeric NOT NULL,
+  risk_level text NOT NULL CHECK (risk_level IN ('low', 'moderate', 'high', 'extreme')),
+  confidence_score numeric NOT NULL,
+  top_factors jsonb NOT NULL DEFAULT '[]'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE flood_predictions ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "select_own_predictions" ON flood_predictions;
+CREATE POLICY "select_own_predictions" ON flood_predictions FOR SELECT
+  TO authenticated USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "insert_own_predictions" ON flood_predictions;
+CREATE POLICY "insert_own_predictions" ON flood_predictions FOR INSERT
+  TO authenticated WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "update_own_predictions" ON flood_predictions;
+CREATE POLICY "update_own_predictions" ON flood_predictions FOR UPDATE
+  TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "delete_own_predictions" ON flood_predictions;
+CREATE POLICY "delete_own_predictions" ON flood_predictions FOR DELETE
+  TO authenticated USING (auth.uid() = user_id);
+
+CREATE INDEX IF NOT EXISTS idx_flood_predictions_user_id ON flood_predictions(user_id);
+CREATE INDEX IF NOT EXISTS idx_flood_predictions_created_at ON flood_predictions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_flood_predictions_risk_level ON flood_predictions(risk_level);

@@ -1,0 +1,76 @@
+export interface PredictionInput {
+  rainfall_mm: number;
+  river_level_m: number;
+  soil_moisture_pct: number;
+  temperature_c: number;
+  humidity_pct: number;
+  wind_speed_kmh: number;
+  pressure_hpa: number;
+  elevation_m: number;
+  drainage_capacity: number;
+  urbanization_pct: number;
+}
+
+export interface FactorContribution {
+  feature: string;
+  label: string;
+  weight: number;
+  value: number;
+  contribution: number;
+}
+
+export interface PredictionResult {
+  probability: number;
+  risk_level: 'low' | 'moderate' | 'high' | 'extreme';
+  confidence: number;
+  top_factors: FactorContribution[];
+}
+
+export interface PredictionRecord {
+  id: string;
+  user_id: string;
+  rainfall_mm: number;
+  river_level_m: number;
+  soil_moisture_pct: number;
+  temperature_c: number;
+  humidity_pct: number;
+  wind_speed_kmh: number;
+  pressure_hpa: number;
+  elevation_m: number;
+  drainage_capacity: number;
+  urbanization_pct: number;
+  flood_probability: number;
+  risk_level: 'low' | 'moderate' | 'high' | 'extreme';
+  confidence_score: number;
+  top_factors: FactorContribution[];
+  created_at: string;
+}
+
+export interface ModelMetrics {
+  accuracy: number;
+  precision: number;
+  recall: number;
+  f1Score: number;
+  auc: number;
+  loss: number;
+  epochs: number;
+  trained: boolean;
+  confusionMatrix: {
+    truePositive: number;
+    falsePositive: number;
+    trueNegative: number;
+    falseNegative: number;
+  };
+}
+
+export interface TrainingHistoryPoint {
+  epoch: number;
+  loss: number;
+  accuracy: number;
+}
+
+export interface FeatureImportance {
+  feature: string;
+  label: string;
+  importance: number;
+}
